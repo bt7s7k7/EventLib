@@ -1,18 +1,18 @@
 import { IDisposable, makeDisposable } from "./IDisposable"
 
-interface IEventListener<T> {
-    listener: (event: T) => void
+interface IEventListener<T, D> {
+    listener: (event: T, object: D) => void
     once: boolean,
     object: IDisposable
 }
 
 export interface IEventEmitter<T> extends IDisposable {
-    add(object: IDisposable, listener: IEventListener<T>["listener"], once?: boolean): string
+    add<D extends IDisposable>(object: D, listener: IEventListener<T, D>["listener"], once?: boolean): string
     remove(id: string): void
     emit(event: T): void
     promise(object: IDisposable): Promise<T>
 
-    [$$getListeners](): Record<string, IEventListener<T>>,
+    [$$getListeners](): Record<string, IEventListener<T, any>>,
 }
 
 let globalId = 0
@@ -23,7 +23,7 @@ function getId() {
 export const $$getListeners = Symbol("getListeners")
 
 export function makeEventEmitter<T>() {
-    let listeners = {} as Record<string, IEventListener<T>>
+    let listeners = {} as Record<string, IEventListener<T, any>>
     return {
         ...makeDisposable(),
         add(object, listener, once = false) {
@@ -42,8 +42,9 @@ export function makeEventEmitter<T>() {
         },
         emit(event) {
             for (let id of Object.keys(listeners)) {
-                listeners[id].listener(event)
-                if (listeners[id].once) this.remove(id)
+                let once = listeners[id].once
+                listeners[id].listener(event, listeners[id].object)
+                if (once && listeners[id] != null) this.remove(id)
             }
         },
         [$$getListeners]: () => listeners,

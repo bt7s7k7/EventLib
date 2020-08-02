@@ -92,6 +92,21 @@ describe("IEventEmitter", () => {
             disposable.dispose()
             emitter.dispose()
         })
+
+        it("Should provide the disposable that registered the event", () => {
+            let emitter = makeEventEmitter<void>()
+            let count = 0
+
+            emitter.add(makeDisposable(), (event, object) => {
+                object.dispose()
+                count++
+            })
+
+            emitter.emit(void 0)
+            emitter.emit(void 0)
+
+            expect(count).to.equal(1)
+        })
     })
 
     describe("promise()", () => {
