@@ -1,55 +1,62 @@
 import { expect } from "chai"
-import { makeDisposable } from "../../src/eventLib/IDisposable"
-import { $$getListeners, makeEventEmitter } from "../../src/eventLib/IEventEmitter"
+import { EventEmitter } from "../../src/eventLib/EventEmitter"
+import { EventListener } from "../../src/eventLib/EventListener"
 
 describe("IEventEmitter", () => {
     it("Should not throw on valid input", () => {
-        makeEventEmitter<number>()
+        new EventEmitter<number>()
     })
 
     describe("add()", () => {
         it("Should add a listener and return its id", () => {
-            let disposable = makeDisposable()
-            let emitter = makeEventEmitter<number>()
+            let listenerObject = new EventListener()
+            let emitter = new EventEmitter<number>()
             let listener = (event: number) => console.log(event)
-            let id = emitter.add(disposable, listener)
+            let id = emitter.add(listenerObject, listener)
 
-            expect(emitter[$$getListeners]()).to.deep.equal({ [id]: { listener, once: false, object: emitter[$$getListeners]()[id].object } })
+            // @ts-ignore
+            let listeners = emitter.listeners
+            expect(listeners).to.deep.equal({ [id]: { listener, once: false, listenerObject: listenerObject } })
 
-            disposable.dispose()
             emitter.dispose()
+            listenerObject.dispose()
         })
 
         it("Should store the correct `.once` setting", () => {
-            let disposable = makeDisposable()
-            let emitter = makeEventEmitter<number>()
+            let listenerObject = new EventListener()
+            let emitter = new EventEmitter<number>()
             let listener = (event: number) => console.log(event)
-            let id = emitter.add(disposable, listener, true)
+            let id = emitter.add(listenerObject, listener, true)
 
-            expect(emitter[$$getListeners]()).to.deep.equal({ [id]: { listener, once: true, object: emitter[$$getListeners]()[id].object } })
+            // @ts-ignore
+            let listeners = emitter.listeners
+            expect(listeners).to.deep.equal({ [id]: { listener, once: true, listenerObject: listenerObject } })
 
-            disposable.dispose()
             emitter.dispose()
+            listenerObject.dispose()
         })
     })
 
     describe("remove()", () => {
         it("Should remove a listener with the id", () => {
-            let disposable = makeDisposable()
-            let emitter = makeEventEmitter<number>()
+            let listenerObject = new EventListener()
+            let emitter = new EventEmitter<number>()
             let listener = (event: number) => console.log(event)
-            let id1 = emitter.add(disposable, listener)
-            let id2 = emitter.add(disposable, listener)
+            let id1 = emitter.add(listenerObject, listener, true)
+            let id2 = emitter.add(listenerObject, listener, true)
 
             emitter.remove(id1)
-            expect(emitter[$$getListeners]()).to.deep.equal({ [id2]: { listener, once: false, object: emitter[$$getListeners]()[id2].object } })
 
-            disposable.dispose()
+            // @ts-ignore
+            let listeners = emitter.listeners
+            expect(listeners).to.deep.equal({ [id2]: { listener, once: true, listenerObject: listenerObject } })
+
             emitter.dispose()
+            listenerObject.dispose()
         })
 
         it("Should throw `RangeError` on wrong id", () => {
-            let emitter = makeEventEmitter<number>()
+            let emitter = new EventEmitter<number>()
 
             expect(() => {
                 emitter.remove("wrong")
@@ -59,28 +66,28 @@ describe("IEventEmitter", () => {
 
     describe("emit()", () => {
         it("Should call all callbacks", () => {
-            let disposable = makeDisposable()
-            let emitter = makeEventEmitter<number>()
+            let listenerObject = new EventListener()
+            let emitter = new EventEmitter<number>()
             let count = 0
-            emitter.add(disposable, () => count++)
-            emitter.add(disposable, () => count++)
-            emitter.add(disposable, () => count++)
+            emitter.add(listenerObject, () => count++)
+            emitter.add(listenerObject, () => count++)
+            emitter.add(listenerObject, () => count++)
 
             emitter.emit(0)
             expect(count).to.equal(3)
 
-            disposable.dispose()
+            listenerObject.dispose()
             emitter.dispose()
         })
 
         it("Should remove once listeners", () => {
-            let disposable = makeDisposable()
-            let emitter = makeEventEmitter<number>()
+            let listenerObject = new EventListener()
+            let emitter = new EventEmitter<number>()
             let count = 0
-            emitter.add(disposable, () => count++)
-            let id = emitter.add(disposable, () => count++, true)
-            emitter.add(disposable, () => count++, true)
-            emitter.add(disposable, () => count++)
+            emitter.add(listenerObject, () => count++)
+            let id = emitter.add(listenerObject, () => count++, true)
+            emitter.add(listenerObject, () => count++, true)
+            emitter.add(listenerObject, () => count++)
 
             emitter.emit(0)
             expect(count).to.equal(4)
@@ -89,20 +96,19 @@ describe("IEventEmitter", () => {
             emitter.emit(0)
             expect(count).to.equal(2)
 
-            disposable.dispose()
+            listenerObject.dispose()
             emitter.dispose()
         })
 
         it("Should provide the disposable that registered the event", () => {
-            let emitter = makeEventEmitter<void>()
+            let emitter = new EventEmitter<void>()
             let count = 0
-
-            emitter.add(makeDisposable(), (event, object) => {
-                object.dispose()
+            let listenerObject = new EventListener()
+            emitter.add(listenerObject, (_, object) => {
+                expect(listenerObject).to.eq(object)
                 count++
             })
 
-            emitter.emit(void 0)
             emitter.emit(void 0)
 
             expect(count).to.equal(1)
@@ -111,17 +117,17 @@ describe("IEventEmitter", () => {
 
     describe("promise()", () => {
         it("Should resolve a promise on emit", (done) => {
-            let disposable = makeDisposable()
-            let emitter = makeEventEmitter<number>()
+            let listenerObject = new EventListener()
+            let emitter = new EventEmitter<number>()
             let counter = 0
-            emitter.promise(disposable).then(() => counter++)
+            emitter.promise(listenerObject).then(() => counter++)
             emitter.emit(0)
 
             setTimeout(() => {
                 expect(counter).to.equal(1)
                 done()
 
-                disposable.dispose()
+                listenerObject.dispose()
                 emitter.dispose()
             }, 1)
         })
