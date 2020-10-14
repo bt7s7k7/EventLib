@@ -20,8 +20,6 @@ button.onClick.add(new EventListener(), (event, clickListener) => {
 ## Install
 
 This library is installable using [UCPeM](https://github.com/bt7s7k7/UCPeM)
-```
-https://github.com/bt7s7k7/EventLib.git
-    eventLib
-end
+```js
+const eventLib = github("bt7s7k7/EventLib").res("eventLib")
 ```
