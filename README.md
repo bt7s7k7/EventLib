@@ -2,7 +2,7 @@
 TypeScript library for events and disposable objects. Usable in Node.js and in the browser. 
 ````ts
 class Button extends Disposable {
-    onClick = new EventListener<ClickEvent>
+    onClick = new EventEmitter<ClickEvent>
 }
 
 const button = new Button()
