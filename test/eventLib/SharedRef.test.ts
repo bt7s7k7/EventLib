@@ -54,5 +54,6 @@ describeMembers(() => new ShareRef(trackableFactory("", "Value")[1]), {
             disposeTracker.check(1)
         })
     },
-    store: null
+    store: null,
+    makeWeak: null
 })
