@@ -3,7 +3,7 @@ import { Disposable, DISPOSE, IDisposable } from "./Disposable"
 export interface InternalSharedStore<T> {
     value: T | null,
     users: number,
-    callbacks: Record<number, () => void>
+    callbacks: Record<string, () => void>
 }
 
 export class ShareRef<T extends IDisposable> extends Disposable {
