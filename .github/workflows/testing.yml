@@ -8,13 +8,15 @@ jobs:
     name: Test
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      with:
-        node-version: '12.x'
-    - run: npm install
-      name: Install npm packages
-    - run: npm run build
-      name: Build typescript
-    - run: npm run test
-      name: Run test script
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - run: npm install
+        name: Install npm packages
+      - name: Install UCPeM ports
+        run: curl -L https://github.com/bt7s7k7/UCPeM/releases/latest/download/ucpem.js | node - install
+      - run: npm run build
+        name: Build typescript
+      - run: npm run test
+        name: Run test script
