@@ -29,12 +29,12 @@ interface IEventListenerReference<T, L extends IDisposable> {
 export class EventEmitter<T> extends Disposable {
     protected listeners = {} as Record<string, IEventListenerReference<T, any>>
 
-    add<D extends EventListener>(object: D, listener: Listener<T, D>, once = false) {
+    add<D extends EventListener>(object: D | null, listener: Listener<T, D>, once = false) {
         const id = IDProvider.next()
 
         this.listeners[id] = {
             listener, once,
-            self: new ScriptableWeakRef(object[EVENT_LISTENER_REF](), () => {
+            self: new ScriptableWeakRef((object ?? new EventListener())[EVENT_LISTENER_REF](), () => {
                 this.remove(id)
             })
         }

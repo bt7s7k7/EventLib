@@ -34,12 +34,12 @@ export class ShareRef<T extends IDisposable> extends Disposable {
             this.store.users--
 
             if (this.store.users == 0) {
-                this.store.value![DISPOSE]()
-                this.store.value = null
-
                 Object.values(this.store.callbacks).forEach(v => v())
 
                 this.store.callbacks = {}
+
+                this.store.value![DISPOSE]()
+                this.store.value = null
             }
 
             super[DISPOSE]()

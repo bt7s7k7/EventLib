@@ -121,9 +121,6 @@ describeMembers(() => new EventEmitter<number>(), {
 
             const id = emitter.add(listener, () => { })
 
-            // @ts-ignore
-            expect(emitter.listeners[id].self.value).to.equal(listener)
-
             listener.dispose()
 
             // @ts-ignore

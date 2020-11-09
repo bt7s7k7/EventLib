@@ -8,8 +8,6 @@ describeMembers(() => new EventListener(), {
             const listener = new EventListener()
             const ref = listener[EVENT_LISTENER_REF]()
 
-            expect(ref.tryGetValue()).to.equal(listener)
-
             listener.dispose()
 
             expect(ref.tryGetValue()).to.be.null
