@@ -28,12 +28,4 @@ export class Disposable implements IDisposable {
     [DISPOSE]() {
         disposeObject(this)
     }
-
-    static make() {
-        return {
-            [DISPOSE]() {
-                disposeObject(this)
-            }
-        }
-    }
 }
