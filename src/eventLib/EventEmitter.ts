@@ -39,7 +39,7 @@ export class EventEmitter<T> extends Disposable {
             })
         }
 
-        return id
+        return new EventEmitter.ListenerHandle(id, this)
     }
 
     remove(id: string) {
@@ -71,5 +71,19 @@ export class EventEmitter<T> extends Disposable {
         }
 
         super[DISPOSE]()
+    }
+}
+
+export namespace EventEmitter {
+    export class ListenerHandle {
+
+        public remove() {
+            this.eventEmitter.remove(this.id)
+        }
+
+        constructor(
+            public readonly id: string,
+            protected readonly eventEmitter: EventEmitter<any>
+        ) { }
     }
 }

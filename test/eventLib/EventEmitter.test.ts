@@ -85,13 +85,13 @@ describeMembers(() => new EventEmitter<number>(), {
 
             const emitTracker = tracker("emitTracker")
 
-            const id = emitter.add(listener, () => emitTracker.trigger())
+            const handle = emitter.add(listener, () => emitTracker.trigger())
 
             emitter.emit(5)
 
             emitTracker.check()
 
-            emitter.remove(id)
+            handle.remove()
 
             emitter.emit(10)
 
