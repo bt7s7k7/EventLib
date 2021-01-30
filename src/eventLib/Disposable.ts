@@ -8,8 +8,8 @@ export function disposeObject<T extends object>(object: T) {
         }
     }
 
-    for (const property of Object.values(object)) {
-        if (typeof property == "object" && property != null && DISPOSE in property) {
+    for (const [key, property] of Object.entries(object)) {
+        if (typeof property == "object" && property != null && ((key.endsWith("_d") || key.startsWith("on")) && DISPOSE in property)) {
             property[DISPOSE]()
         }
     }

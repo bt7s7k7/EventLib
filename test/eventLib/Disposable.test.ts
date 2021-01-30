@@ -6,11 +6,11 @@ describeMembers(() => new Disposable(), {
     dispose(instance) {
         it("Should call dispose on all properties", () => {
             const callTracker = tracker("callTracker")
-            Object.assign(instance, { property: { [DISPOSE]: () => callTracker.trigger() } })
+            Object.assign(instance, { property_d: { [DISPOSE]: () => callTracker.trigger() }, onEvent: { [DISPOSE]: () => callTracker.trigger() } })
 
             instance.dispose()
 
-            callTracker.check()
+            callTracker.check(2)
         })
     }
 })
