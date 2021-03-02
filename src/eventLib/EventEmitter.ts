@@ -1,7 +1,7 @@
-import { Disposable, DISPOSE, disposeObject, IDisposable } from "./Disposable";
-import { EventListener, EVENT_LISTENER_REF } from "./EventListener";
-import { IDProvider } from "./IDProvider";
-import { WeakRef } from "./SharedRef";
+import { Disposable, DISPOSE, disposeObject, IDisposable } from "./Disposable"
+import { EventListener, EVENT_LISTENER_REF, IEventListener } from "./EventListener"
+import { IDProvider } from "./IDProvider"
+import { WeakRef } from "./SharedRef"
 
 class ScriptableWeakRef<T extends IDisposable> extends WeakRef<T> implements IDisposable {
     protected readonly id = IDProvider.next()
@@ -18,7 +18,7 @@ class ScriptableWeakRef<T extends IDisposable> extends WeakRef<T> implements IDi
     }
 }
 
-type Listener<T, L extends IDisposable> = (event: T, self: L) => void;
+type Listener<T, L extends IDisposable> = (event: T, self: L) => void
 
 interface IEventListenerReference<T, L extends IDisposable> {
     listener: (Listener<T, L>)
@@ -29,7 +29,7 @@ interface IEventListenerReference<T, L extends IDisposable> {
 export class EventEmitter<T> extends Disposable {
     protected listeners = {} as Record<string, IEventListenerReference<T, any>>
 
-    add<D extends EventListener>(object: D | null, listener: Listener<T, D>, once = false) {
+    add<D extends IEventListener>(object: D | null, listener: Listener<T, D>, once = false) {
         const id = IDProvider.next()
 
         this.listeners[id] = {
@@ -52,14 +52,15 @@ export class EventEmitter<T> extends Disposable {
 
     emit(event: T) {
         for (let id of Object.keys(this.listeners)) {
-            const once = this.listeners[id].once
-            const self = this.listeners[id].self.tryGetValue()
-            this.listeners[id].listener(event, self)
+            const listener = this.listeners[id]
+            const once = listener.once
+            const self = listener.self.tryGetValue()
             if (once && this.listeners[id] != null) this.remove(id)
+            listener.listener(event, self)
         }
     }
 
-    promise(object: EventListener) {
+    promise(object: IEventListener) {
         return new Promise<T>(resolve => {
             this.add(object, resolve, true)
         })
