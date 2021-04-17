@@ -1,14 +1,12 @@
-import { Disposable, DISPOSE, IDisposable } from "./Disposable";
-import { ShareRef, WeakRef } from "./SharedRef";
-
-export const EVENT_LISTENER_REF = Symbol("eventListenerRef")
+import { Disposable, DISPOSE, IDisposable } from "./Disposable"
+import { ShareRef, WeakRef } from "./SharedRef"
 
 export interface IEventListener extends IDisposable {
-    [EVENT_LISTENER_REF](): WeakRef<IDisposable>
+    getWeakRef(): WeakRef<IDisposable>
 }
 
 export class EventListener extends Disposable implements IEventListener {
-    public [EVENT_LISTENER_REF]() {
+    public getWeakRef() {
         return this.shared!.makeWeak()
     }
 
@@ -22,7 +20,7 @@ export class EventListener extends Disposable implements IEventListener {
         super[DISPOSE]()
     }
 
-    protected shared: ShareRef<EventListener> | null = new ShareRef(this)
+    protected shared: ShareRef<this> | null = new ShareRef(this)
 
     constructor() {
         super()

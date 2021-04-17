@@ -71,6 +71,8 @@ export class WeakRef<T extends IDisposable> {
     }
 
     constructor(protected readonly store: InternalSharedStore<T>) { }
+
+    static empty = new WeakRef<any>({ callbacks: {}, users: 1, value: null })
 }
 
 export class DisposedReferenceError extends Error { }

@@ -1,5 +1,5 @@
 import { Disposable, DISPOSE, disposeObject, IDisposable } from "./Disposable"
-import { EventListener, EVENT_LISTENER_REF, IEventListener } from "./EventListener"
+import { EventListener, IEventListener } from "./EventListener"
 import { IDProvider } from "./IDProvider"
 import { WeakRef } from "./SharedRef"
 
@@ -34,7 +34,7 @@ export class EventEmitter<T> extends Disposable {
 
         this.listeners[id] = {
             listener, once,
-            self: new ScriptableWeakRef((object ?? new EventListener())[EVENT_LISTENER_REF](), () => {
+            self: new ScriptableWeakRef((object ?? new EventListener()).getWeakRef(), () => {
                 this.remove(id)
             })
         }
