@@ -1,5 +1,6 @@
 
 export const DISPOSE = Symbol("dispose")
+export const AUTO_DISPOSE = Symbol("autoDispose")
 
 export function disposeObject<T extends object>(object: T) {
     if (DISPOSE in object) {
@@ -9,7 +10,7 @@ export function disposeObject<T extends object>(object: T) {
     }
 
     for (const [key, property] of Object.entries(object)) {
-        if (typeof property == "object" && property != null && ((key.endsWith("_d") || key.startsWith("on")) && DISPOSE in property)) {
+        if (typeof property == "object" && property != null && property[AUTO_DISPOSE]) {
             property[DISPOSE]()
         }
     }

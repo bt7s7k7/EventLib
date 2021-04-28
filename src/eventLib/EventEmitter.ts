@@ -1,4 +1,4 @@
-import { Disposable, DISPOSE, disposeObject, IDisposable } from "./Disposable"
+import { AUTO_DISPOSE, Disposable, DISPOSE, disposeObject, IDisposable } from "./Disposable"
 import { EventListener, IEventListener } from "./EventListener"
 import { IDProvider } from "./IDProvider"
 import { WeakRef } from "./SharedRef"
@@ -28,6 +28,7 @@ interface IEventListenerReference<T, L extends IDisposable> {
 
 export class EventEmitter<T> extends Disposable {
     protected listeners = {} as Record<string, IEventListenerReference<T, any>>
+    protected [AUTO_DISPOSE] = true
 
     add<D extends IEventListener>(object: D | null, listener: Listener<T, D>, once = false) {
         const id = IDProvider.next()
