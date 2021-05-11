@@ -4,7 +4,7 @@ import { IDProvider } from "./IDProvider"
 import { WeakRef } from "./SharedRef"
 
 class ScriptableWeakRef<T extends IDisposable> extends WeakRef<T> implements IDisposable {
-    protected readonly id = IDProvider.next()
+    protected readonly id = IDProvider.getID()
 
     public [DISPOSE]() {
         delete this.store.callbacks[this.id]
@@ -31,7 +31,7 @@ export class EventEmitter<T> extends Disposable {
     protected [AUTO_DISPOSE] = true
 
     add<D extends IEventListener>(object: D | null, listener: Listener<T, D>, once = false) {
-        const id = IDProvider.next()
+        const id = IDProvider.getID()
 
         this.listeners[id] = {
             listener, once,

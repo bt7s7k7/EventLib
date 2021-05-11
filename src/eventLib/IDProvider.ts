@@ -1,7 +1,7 @@
 let id = 0
 
-export const IDProvider = {
-    next() {
+export namespace IDProvider {
+    export function getID() {
         return (id++).toString()
     }
 }
