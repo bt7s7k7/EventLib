@@ -1,8 +1,9 @@
-import { expect } from "chai";
-import { EventEmitter } from "../../src/eventLib/EventEmitter";
-import { EventListener } from "../../src/eventLib/EventListener";
-import { describeMembers } from "../testUtil/describeMembers";
-import { tracker } from "../testUtil/tracker";
+import { expect } from "chai"
+import { DisposeObserver, EventEmitter } from "../../src/eventLib/EventEmitter"
+import { EventListener } from "../../src/eventLib/EventListener"
+import { describeMember } from "../testUtil/describeMember"
+import { describeMembers } from "../testUtil/describeMembers"
+import { tracker } from "../testUtil/tracker"
 
 describeMembers(() => new EventEmitter<number>(), {
     add() {
@@ -128,4 +129,21 @@ describeMembers(() => new EventEmitter<number>(), {
         })
     },
     listeners: null
+})
+
+describeMember(() => DisposeObserver, () => {
+    it("Should emit an event when the target is disposed", () => {
+        const target = new EventListener()
+        const observer = new DisposeObserver(target.getWeakRef())
+
+        const emitTracker = tracker("emitTracker")
+
+        observer.onDispose.add(null, () => {
+            emitTracker.trigger()
+        })
+
+        target.dispose()
+
+        emitTracker.check()
+    })
 })

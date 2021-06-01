@@ -89,3 +89,11 @@ export namespace EventEmitter {
         ) { }
     }
 }
+
+export class DisposeObserver<T extends IDisposable> extends ScriptableWeakRef<T> {
+    public readonly onDispose = new EventEmitter<{ target: T | null }>()
+
+    constructor(target: WeakRef<T>) {
+        super(target, () => this.onDispose.emit({ target: target.tryGetValue() }))
+    }
+}
