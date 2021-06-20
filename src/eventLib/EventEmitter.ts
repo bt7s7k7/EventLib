@@ -26,7 +26,7 @@ interface IEventListenerReference<T, L extends IDisposable> {
     self: ScriptableWeakRef<L>
 }
 
-export class EventEmitter<T> extends Disposable {
+export class EventEmitter<T = void> extends Disposable {
     protected listeners = {} as Record<string, IEventListenerReference<T, any>>
     protected [AUTO_DISPOSE] = true
 
