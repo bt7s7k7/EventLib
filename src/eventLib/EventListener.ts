@@ -6,23 +6,26 @@ export interface IEventListener extends IDisposable {
 }
 
 export class EventListener extends Disposable implements IEventListener {
-    public getWeakRef() {
-        return this.shared!.makeWeak()
+    public getWeakRef = implementEventListener(this)
+}
+
+export function implementEventListener<T extends IDisposable>(target: T) {
+    let shared: ShareRef<T> | null = new ShareRef(target)
+
+    const ret: () => WeakRef<T> = function () {
+        return shared!.makeWeak()
     }
 
-    [DISPOSE]() {
+    const oldDispose = target[DISPOSE]
+    target[DISPOSE] = function () {
         this[DISPOSE] = () => { }
         // Call dispose on the SharedRef separately, because
         // the superclass DISPOSE sets the DISPOSE callback
         // to error, replacing our empty callback
-        this.shared![DISPOSE]()
-        this.shared = null
-        super[DISPOSE]()
+        shared![DISPOSE]()
+        shared = null
+        oldDispose.apply(this)
     }
 
-    protected shared: ShareRef<this> | null = new ShareRef(this)
-
-    constructor() {
-        super()
-    }
+    return ret
 }
