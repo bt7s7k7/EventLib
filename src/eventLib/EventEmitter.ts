@@ -61,7 +61,7 @@ export class EventEmitter<T = void> extends Disposable {
         }
     }
 
-    promise(object: IEventListener) {
+    promise(object: IEventListener | null) {
         return new Promise<T>(resolve => {
             this.add(object, resolve, true)
         })
