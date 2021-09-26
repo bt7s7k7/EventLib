@@ -48,12 +48,14 @@ export class EventEmitter<T = void> extends Disposable {
             const listener = this.listeners[id]
             listener.self[DISPOSE]()
             delete this.listeners[id]
-        } else throw new RangeError(`Event listener with id = "${id}" is not registered`)
+        }
     }
 
     emit(event: T) {
         for (let id of Object.keys(this.listeners)) {
             const listener = this.listeners[id]
+            // Listener can be null, if it is removed during execution of another listener
+            if (listener == null) continue
             const once = listener.once
             const self = listener.self.tryGetValue()
             if (once && this.listeners[id] != null) this.remove(id)
@@ -91,6 +93,8 @@ export namespace EventEmitter {
 }
 
 export class DisposeObserver<T extends IDisposable> extends ScriptableWeakRef<T> {
+    public [AUTO_DISPOSE] = true
+
     public readonly onDispose = new EventEmitter<{ target: T | null }>()
 
     constructor(target: WeakRef<T>) {

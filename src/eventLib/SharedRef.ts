@@ -62,6 +62,10 @@ export class WeakRef<T extends IDisposable> {
         return value
     }
 
+    get alive() {
+        return this.store.value != null
+    }
+
     tryGetValue() {
         return this.store.value
     }

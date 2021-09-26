@@ -13,7 +13,7 @@ export function implementEventListener<T extends IDisposable>(target: T) {
     let shared: ShareRef<T> | null = new ShareRef(target)
 
     const ret: () => WeakRef<T> = function () {
-        return shared!.makeWeak()
+        return shared ? shared.makeWeak() : WeakRef.empty
     }
 
     const oldDispose = target[DISPOSE]
