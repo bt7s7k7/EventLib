@@ -2,7 +2,7 @@
 TypeScript library for events and disposable objects. Usable in Node.js and in the browser. 
 ````ts
 class Button extends Disposable {
-    onClick = new EventEmitter<ClickEvent>
+    public readonly onClick = new EventEmitter<ClickEvent>()
 }
 
 const button = new Button()
@@ -16,10 +16,3 @@ button.onClick.add(new EventListener(), (event, clickListener) => {
     }
 })
 ````
-
-## Install
-
-This library is installable using [UCPeM](https://github.com/bt7s7k7/UCPeM)
-```js
-const eventLib = github("bt7s7k7/EventLib").res("eventLib")
-```

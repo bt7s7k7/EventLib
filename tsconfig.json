@@ -8,10 +8,11 @@
             "es6"
         ],
         "module": "CommonJS",
-        "outDir": "build"
+        "outDir": "dist",
+        "declaration": true,
+        "emitDeclarationOnly": true,
     },
     "include": [
-        "src",
-        "test"
+        "src"
     ]
 }

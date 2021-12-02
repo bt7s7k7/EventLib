@@ -3,6 +3,7 @@
 /.nyc_output
 /coverage
 /node_modules
+/dist
 
 # UCPEM
 ucpem_ports

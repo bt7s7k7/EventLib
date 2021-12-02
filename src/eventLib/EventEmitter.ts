@@ -55,11 +55,12 @@ export class EventEmitter<T = void> extends Disposable {
         for (let id of Object.keys(this.listeners)) {
             const listener = this.listeners[id]
             // Listener can be null, if it is removed during execution of another listener
-            if (listener == null) continue
-            const once = listener.once
-            const self = listener.self.tryGetValue()
-            if (once && this.listeners[id] != null) this.remove(id)
-            listener.listener(event, self)
+            if (listener != null) {
+                const once = listener.once
+                const self = listener.self.tryGetValue()
+                if (once && this.listeners[id] != null) this.remove(id)
+                listener.listener(event, self)
+            }
         }
     }
 

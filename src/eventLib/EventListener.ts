@@ -24,7 +24,7 @@ export function implementEventListener<T extends IDisposable>(target: T) {
         // to error, replacing our empty callback
         shared![DISPOSE]()
         shared = null
-        oldDispose.apply(this)
+        Reflect.apply(oldDispose, this, [])
     }
 
     return ret

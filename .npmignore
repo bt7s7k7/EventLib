@@ -1,0 +1,12 @@
+src
+node_modules
+test
+ucpem_ports
+ucpem.js
+.vscode
+.nyc_output
+.github
+dist/tsconfig.tsbuildinfo
+esbuild.js
+tsconfig.json
+.gitattributes

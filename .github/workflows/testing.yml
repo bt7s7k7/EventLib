@@ -11,10 +11,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: "14.x"
       - name: Install packages
         run: yarn
-      - name: Install UCPeM ports
-        run: curl -L https://github.com/bt7s7k7/UCPeM/releases/latest/download/ucpem.js | node - install
       - name: Run test script
         run: yarn test
