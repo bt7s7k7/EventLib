@@ -1,6 +1,6 @@
 {
     "name": "@bt7s7k7/eventlib",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "TypeScript library for events and disposable objects",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -20,7 +20,7 @@
         "url": "https://github.com/bt7s7k7/EventLib/issues"
     },
     "homepage": "https://github.com/bt7s7k7/EventLib#readme",
-    "dependencies": {
+    "devDependencies": {
         "@types/chai": "^4.2.12",
         "@types/mocha": "^8.0.1",
         "chai": "^4.2.0",
@@ -28,9 +28,7 @@
         "mocha": "^8.1.0",
         "nyc": "^15.1.0",
         "ts-node": "^8.10.2",
-        "typescript": "^3.9.7"
-    },
-    "devDependencies": {
+        "typescript": "^3.9.7",
         "@types/node": "^14.0.27",
         "source-map-support": "^0.5.19",
         "ts-node-dev": "^1.0.0"
