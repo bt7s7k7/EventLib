@@ -75,6 +75,8 @@ export class EventEmitter<T = void> extends Disposable {
             listener.self[DISPOSE]()
         }
 
+        this.listeners = {}
+
         super[DISPOSE]()
     }
 }
