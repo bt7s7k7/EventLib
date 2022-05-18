@@ -35,7 +35,7 @@ export class EventEmitter<T = void> extends Disposable {
 
         this.listeners[id] = {
             listener, once,
-            self: new ScriptableWeakRef((object ?? new EventListener()).getWeakRef(), () => {
+            self: new ScriptableWeakRef((object ?? (new EventListener() as IEventListener)).getWeakRef(), () => {
                 this.remove(id)
             })
         }

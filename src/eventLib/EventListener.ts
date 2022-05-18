@@ -2,7 +2,7 @@ import { Disposable, DISPOSE, IDisposable } from "./Disposable"
 import { ShareRef, WeakRef } from "./SharedRef"
 
 export interface IEventListener extends IDisposable {
-    getWeakRef(): WeakRef<IDisposable>
+    getWeakRef(): WeakRef<this>
 }
 
 export class EventListener extends Disposable implements IEventListener {
