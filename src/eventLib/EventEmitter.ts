@@ -81,6 +81,31 @@ export class EventEmitter<T = void> extends Disposable {
     }
 }
 
+export class DebouncedEventEmitter<T> extends EventEmitter<T> {
+    protected _timeout = -1
+    protected _nextEvent: T | null = null
+
+    public [DISPOSE]() {
+        super[DISPOSE]()
+        if (this._timeout != -1) clearTimeout(this._timeout)
+    }
+
+    public emit(event?: T): void {
+        this._nextEvent = event!
+        if (this._timeout == -1) {
+            this._timeout = setTimeout(() => {
+                super.emit(this._nextEvent!)
+                this._timeout = -1
+                this._nextEvent = null
+            }, this.timeout)
+        }
+    }
+
+    constructor(
+        public readonly timeout: number
+    ) { super() }
+}
+
 export namespace EventEmitter {
     export class ListenerHandle {
 
