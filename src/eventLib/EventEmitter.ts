@@ -18,7 +18,7 @@ class ScriptableWeakRef<T extends IDisposable> extends WeakRef<T> implements IDi
     }
 }
 
-type Listener<T, L extends IDisposable> = (event: T, self: L) => void
+export type Listener<T, L extends IDisposable> = (event: T, self: L) => void
 
 interface IEventListenerReference<T, L extends IDisposable> {
     listener: (Listener<T, L>)
@@ -29,13 +29,18 @@ interface IEventListenerReference<T, L extends IDisposable> {
 export class EventEmitter<T = void> extends Disposable {
     protected listeners = {} as Record<string, IEventListenerReference<T, any>>
     protected [AUTO_DISPOSE] = true
+    protected _timeout
+    protected _async
+    protected _timeoutID: ReturnType<typeof setTimeout> | null = null
+    protected _nextEvent: T | null = null
 
     add<D extends IEventListener>(object: D | null, listener: Listener<T, D>, once = false) {
         const id = IDProvider.getID()
+        object = object ?? (new EventListener() as unknown as D)
 
         this.listeners[id] = {
             listener, once,
-            self: new ScriptableWeakRef((object ?? (new EventListener() as IEventListener)).getWeakRef(), () => {
+            self: new ScriptableWeakRef(object!.getWeakRef(), () => {
                 this.remove(id)
             })
         }
@@ -51,7 +56,7 @@ export class EventEmitter<T = void> extends Disposable {
         }
     }
 
-    emit(event: T) {
+    protected _emit(event: T) {
         for (let id of Object.keys(this.listeners)) {
             const listener = this.listeners[id]
             // Listener can be null, if it is removed during execution of another listener
@@ -64,9 +69,31 @@ export class EventEmitter<T = void> extends Disposable {
         }
     }
 
-    promise(object: IEventListener | null) {
+    emit(event: T) {
+        if (this._timeout != null) {
+            this._nextEvent = event!
+            if (this._timeoutID == null) {
+                this._timeoutID = setTimeout(() => {
+                    this._emit(this._nextEvent!)
+                    this._timeoutID = null
+                    this._nextEvent = null
+                }, this._timeout)
+            }
+        } else if (this._async) {
+            queueMicrotask(() => this._emit(event))
+        } else {
+            this._emit(event)
+        }
+    }
+
+    promise(object: IEventListener | null, predicate?: (value: T) => boolean) {
         return new Promise<T>(resolve => {
-            this.add(object, resolve, true)
+            const handle = this.add(object, (value) => {
+                if (predicate != null && !predicate(value)) return
+
+                resolve(value)
+                handle.remove()
+            }, false)
         })
     }
 
@@ -79,31 +106,13 @@ export class EventEmitter<T = void> extends Disposable {
 
         super[DISPOSE]()
     }
-}
 
-export class DebouncedEventEmitter<T> extends EventEmitter<T> {
-    protected _timeout: ReturnType<typeof setTimeout> | null = null
-    protected _nextEvent: T | null = null
+    constructor(options?: { debounceTimeout?: number, async?: boolean }) {
+        super()
 
-    public [DISPOSE]() {
-        super[DISPOSE]()
-        if (this._timeout != null) clearTimeout(this._timeout)
+        this._timeout = options?.debounceTimeout ?? null
+        this._async = options?.async ?? false
     }
-
-    public emit(event?: T): void {
-        this._nextEvent = event!
-        if (this._timeout == null) {
-            this._timeout = setTimeout(() => {
-                super.emit(this._nextEvent!)
-                this._timeout = null
-                this._nextEvent = null
-            }, this.timeout)
-        }
-    }
-
-    constructor(
-        public readonly timeout: number
-    ) { super() }
 }
 
 export namespace EventEmitter {
