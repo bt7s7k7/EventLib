@@ -1,5 +1,5 @@
-import { DISPOSE, IDisposable } from "./Disposable";
-import { EventListener } from "./EventListener";
+import { DISPOSE, IDisposable } from "./Disposable"
+import { EventListener } from "./EventListener"
 
 export class ClientEventListener extends EventListener {
     public guard(disposable: IDisposable | (() => void)) {
