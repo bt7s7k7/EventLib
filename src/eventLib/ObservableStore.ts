@@ -41,7 +41,7 @@ export class ComputedStore<R> extends ObservableStore<R> {
     public getWeakRef = implementEventListener(this)
     protected readonly _compute
 
-    public updateNow() {
+    public recompute() {
         const value = this._compute()
         this.emit(value)
     }
@@ -59,7 +59,7 @@ export class ComputedStore<R> extends ObservableStore<R> {
         }
         const computed = new ComputedStore(compute, options)
 
-        const updateNow = () => computed.updateNow()
+        const updateNow = () => computed.recompute()
         for (const observable of input) {
             observable.add(computed, updateNow)
         }
