@@ -34,9 +34,10 @@ export class EventEmitter<T = void> extends Disposable {
     protected _timeoutID: ReturnType<typeof setTimeout> | null = null
     protected _nextEvent: T | null = null
 
-    add<D extends IEventListener>(object: D | null, listener: Listener<T, D>, once = false) {
+    add<D extends IEventListener>(object: D | null, listener: Listener<T, D>, options: boolean | { once?: boolean } = false) {
         const id = IDProvider.getID()
         object = object ?? (new EventListener() as unknown as D)
+        const once = typeof options == "object" ? (options.once ?? false) : options
 
         this.listeners[id] = {
             listener, once,
