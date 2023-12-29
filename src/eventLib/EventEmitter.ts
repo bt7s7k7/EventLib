@@ -26,12 +26,22 @@ interface IEventListenerReference<T, L extends IDisposable> {
     self: ScriptableWeakRef<L>
 }
 
+interface _EventEmitterOptions {
+    /** Waits this timeout before calling listeners, only the latest event value is emitted @default false */
+    debounceTimeout?: number
+    /** Calls listeners on next microtask, only the latest event is emitted, use `deduplicate` to change @default false */
+    async?: boolean
+    /** If `async`, only emits the latest event @default true */
+    deduplicate?: boolean
+}
+
 export class EventEmitter<T = void> extends Disposable {
     protected listeners = {} as Record<string, IEventListenerReference<T, any>>
     protected [AUTO_DISPOSE] = true
     protected _timeout
     protected _async
-    protected _timeoutID: ReturnType<typeof setTimeout> | null = null
+    protected _deduplicate
+    protected _timeoutID: any = null
     protected _nextEvent: T | null = null
 
     add<D extends IEventListener>(object: D | null, listener: Listener<T, D>, options: boolean | { once?: boolean } = false) {
@@ -73,15 +83,31 @@ export class EventEmitter<T = void> extends Disposable {
     emit(event: T) {
         if (this._timeout != null) {
             this._nextEvent = event!
+
             if (this._timeoutID == null) {
                 this._timeoutID = setTimeout(() => {
-                    this._emit(this._nextEvent!)
                     this._timeoutID = null
+                    const nextEvent = this._nextEvent!
                     this._nextEvent = null
+                    this._emit(nextEvent)
                 }, this._timeout)
             }
         } else if (this._async) {
-            queueMicrotask(() => this._emit(event))
+            if (this._deduplicate) {
+                this._nextEvent = event
+
+                if (this._timeoutID == null) {
+                    this._timeoutID = true
+                    queueMicrotask(() => {
+                        this._timeoutID = null
+                        const nextEvent = this._nextEvent!
+                        this._nextEvent = null
+                        this._emit(nextEvent)
+                    })
+                }
+            } else {
+                queueMicrotask(() => this._emit(event))
+            }
         } else {
             this._emit(event)
         }
@@ -108,11 +134,12 @@ export class EventEmitter<T = void> extends Disposable {
         super[DISPOSE]()
     }
 
-    constructor(options?: { debounceTimeout?: number, async?: boolean }) {
+    constructor(options?: _EventEmitterOptions) {
         super()
 
         this._timeout = options?.debounceTimeout ?? null
         this._async = options?.async ?? false
+        this._deduplicate = options?.deduplicate ?? true
     }
 }
 
