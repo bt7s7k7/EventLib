@@ -38,9 +38,9 @@ interface _EventEmitterOptions {
 export class EventEmitter<T = void> extends Disposable {
     protected listeners = {} as Record<string, IEventListenerReference<T, any>>
     protected [AUTO_DISPOSE] = true
-    protected _timeout
-    protected _async
-    protected _deduplicate
+    protected _timeout: number | null
+    protected _async: boolean
+    protected _deduplicate: boolean
     protected _timeoutID: any = null
     protected _nextEvent: T | null = null
 

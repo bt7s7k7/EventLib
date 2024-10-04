@@ -39,7 +39,7 @@ export class ObservableStore<T> extends EventEmitter<T> {
 
 export class ComputedStore<R> extends ObservableStore<R> {
     public getWeakRef = implementEventListener(this)
-    protected readonly _compute
+    protected readonly _compute: () => R
 
     public recompute() {
         const value = this._compute()
